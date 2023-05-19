@@ -1,12 +1,13 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [keywordNum, setKeywordNum] = useState(0);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,12 +17,18 @@ export default function Home() {
     const form = e.currentTarget;
     const link = (form.elements.namedItem("link") as HTMLInputElement).value;
 
-    const res = await fetch(`/api/get-ai-response?link=${link}`);
+    const res = await fetch(
+      `/api/get-ai-response?link=${link}&keyword=${keywordNum}`
+    );
     const data = await res.json();
 
     setData(data.choices[0].text.trim().split("|"));
 
     setLoading(false);
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setKeywordNum(Number(event.target.value));
   };
 
   return (
@@ -33,11 +40,21 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <div>
+        <div>AI Linker</div>
+        <div className="flex bg-custom-blue">
           <form onSubmit={(e) => handleSubmit(e)}>
-            <label htmlFor="link">Enter your link</label>
+            <label htmlFor="link">
+              키워드를 뽑을 뉴스와 키워드 개수를 입력해주세요.
+            </label>
 
             <input type="link" name="link" id="link" placeholder="https://" />
+            <input
+              type="number"
+              name="num"
+              id="num"
+              value={keywordNum}
+              onChange={handleChange}
+            />
 
             <button type="submit">Generate keywords</button>
           </form>
