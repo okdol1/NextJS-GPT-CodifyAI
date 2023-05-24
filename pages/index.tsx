@@ -1,12 +1,32 @@
+import EditorJsRenderer from "@/components/EditorJsRenderer";
+import { OutputBlockData, OutputData } from "@editorjs/editorjs";
 import Head from "next/head";
-import { Inter } from "next/font/google";
-import { ChangeEvent, FormEvent, useState } from "react";
+import React, { FormEvent, useState } from "react";
 
-const inter = Inter({ subsets: ["latin"] });
+const initialData: OutputData = {
+  time: 1664631046512,
+  blocks: [
+    {
+      id: "i1HDCAxqng",
+      type: "code",
+      data: {
+        code: "#python\n\n# This program prints Hello, world!\nprint('Hello, world!')\n",
+      },
+    },
+    {
+      id: "S_oEvbfKfl",
+      type: "code",
+      data: {
+        code: "#css\n\nhtml,\nbody {\n  padding: 0;\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,\n    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;\n}\n\n",
+      },
+    },
+  ],
+  version: "2.25.0",
+};
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<OutputData>(initialData);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,12 +79,8 @@ export default function Home() {
             </select>
             <button type="submit">코드 생성</button>
           </form>
-
           {loading && <div className="text-white">Please wait...</div>}
-
-          <pre>
-            <code>var x = 10; var y = 20; var z = x + y;</code>
-          </pre>
+          <EditorJsRenderer data={data} />
         </div>
       </main>
     </>
