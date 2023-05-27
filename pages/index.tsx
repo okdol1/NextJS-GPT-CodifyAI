@@ -58,29 +58,46 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <div>CodifyAI - AI 코드 생성기</div>
-        <div className="flex bg-custom-blue">
-          <form onSubmit={(e) => handleSubmit(e)}>
-            <label htmlFor="fcn">원하는 기능을 입력해주세요</label>
-
-            <input
-              type="text"
-              name="fcn"
-              id="fcn"
-              placeholder="a + b의 합을 반환하는 함수"
-            />
-            <label htmlFor="language">언어 선택</label>
-            <select id="language">
-              <option value="javascript">JavaScript</option>
-              <option value="react">React</option>
-              <option value="vue">Vue</option>
-              <option value="nextjs">Next.js</option>
-            </select>
-            <button type="submit">코드 생성</button>
-          </form>
-          {loading && <div className="text-white">Please wait...</div>}
-          <EditorJsRenderer data={data} />
+      <main className="w-screen h-screen flex flex-col">
+        <header className="py-2.5 px-10 bg-white drop-shadow-lg">
+          <p className="text-xlarge font-bold text-primary">CodifyAI</p>
+        </header>
+        <div className="bg-grey-100 p-10 flex flex-grow space-x-5">
+          <div className="h-full w-1/2 p-7.5 bg-SystemlightBlue rounded-default flex flex-col">
+            <h1 className="text-large font-bold mb-7.5">Request</h1>
+            <form
+              onSubmit={(e) => handleSubmit(e)}
+              className="flex-grow flex flex-col"
+            >
+              <div className="bg-primary rounded-default py-4 px-5 mb-2.5">
+                <label htmlFor="language">언어 선택</label>
+                <select id="language">
+                  <option value="javascript">JavaScript</option>
+                  <option value="react">React</option>
+                  <option value="vue">Vue</option>
+                  <option value="nextjs">Next.js</option>
+                </select>
+              </div>
+              <div className="bg-grey-100 rounded-default flex-grow flex flex-col">
+                <div className="py-4 px-5 flex-grow">
+                  <input
+                    type="text"
+                    name="fcn"
+                    id="fcn"
+                    placeholder="a + b의 합을 반환하는 함수"
+                  />
+                </div>
+                <div className="py-4 px-5 bg-grey-200 rounded-br-default rounded-bl-default">
+                  <button type="submit">코드 생성</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div className="w-1/2 h-full p-7.5 bg-SystemlightBlue rounded-default">
+            <h1 className="text-large font-bold mb-7.5">Response</h1>
+            {loading && <div className="text-white">Please wait...</div>}
+            <EditorJsRenderer data={data} />
+          </div>
         </div>
       </main>
     </>
