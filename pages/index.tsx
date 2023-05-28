@@ -28,6 +28,7 @@ const initialData: OutputData = {
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<OutputData>(initialData);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -77,13 +78,19 @@ export default function Home() {
                   <option value="nextjs">Next.js</option>
                 </select>
               </div>
-              <div className="bg-grey-100 rounded-default flex-grow flex flex-col">
+              <div
+                className={`bg-grey-100 rounded-default flex-grow flex flex-col border ${
+                  isFocused ? "border-primary" : "border-grey-100"
+                } `}
+              >
                 <div className="py-4 px-5 flex-grow">
-                  <input
-                    type="text"
-                    name="fcn"
-                    id="fcn"
-                    placeholder="a + b의 합을 반환하는 함수"
+                  <textarea
+                    name="txtSource"
+                    id="txtSource"
+                    placeholder="Please enter the content of the code to be generated."
+                    className="w-full h-full bg-grey-100 text-large focus:outline-none resize-none"
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
                   />
                 </div>
                 <div className="py-4 px-5 bg-grey-200 rounded-br-default rounded-bl-default">
