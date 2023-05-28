@@ -1,4 +1,5 @@
 import EditorJsRenderer from "@/components/EditorJsRenderer";
+import Header from "@/components/atom/Header";
 import { OutputBlockData, OutputData } from "@editorjs/editorjs";
 import Head from "next/head";
 import React, { FormEvent, useState } from "react";
@@ -59,9 +60,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="w-screen h-screen flex flex-col">
-        <header className="py-2.5 px-10 bg-white drop-shadow-lg">
-          <p className="text-xlarge font-bold text-primary">CodifyAI</p>
-        </header>
+        <Header />
         <div className="bg-grey-100 p-10 flex flex-grow space-x-5">
           <div className="h-full w-1/2 p-7.5 bg-SystemlightBlue rounded-default flex flex-col">
             <h1 className="text-large font-bold mb-7.5">Request</h1>
