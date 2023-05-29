@@ -11,24 +11,28 @@ const EditorJsToHtml = editorJsHtml({
   },
 });
 
-type Props = {
-  data: OutputData;
-};
+interface P {
+  data: OutputData | null;
+}
+
 type ParsedContent = string | JSX.Element;
 
-const EditorJsRenderer = ({ data }: Props) => {
-  const html = EditorJsToHtml.parse(data) as ParsedContent[];
+const EditorJsRenderer: React.FC<P> = ({ data }) => {
+  const html = data && (EditorJsToHtml.parse(data) as ParsedContent[]);
+
   return (
-    <div className="prose max-w-full ">
-      {html.map((item, index) => {
-        if (typeof item === "string") {
-          return (
-            <div dangerouslySetInnerHTML={{ __html: item }} key={index}></div>
-          );
-        }
-        return item;
-      })}
-    </div>
+    html && (
+      <div className="prose max-w-full ">
+        {html.map((item, index) => {
+          if (typeof item === "string") {
+            return (
+              <div dangerouslySetInnerHTML={{ __html: item }} key={index}></div>
+            );
+          }
+          return item;
+        })}
+      </div>
+    )
   );
 };
 

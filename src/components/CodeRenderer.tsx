@@ -9,9 +9,9 @@ type Props = {
 };
 
 const CodeRenderer = ({ code }: Props) => {
-  const [lang, ...body] = code.split("\n");
+  const [lang, ...body] = code.split("\n\n");
 
-  const language = lang.slice(1);
+  const language = lang.slice(1).toLowerCase().replace(/-/g, "_");
   const _body = body.join("\n");
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const CodeRenderer = ({ code }: Props) => {
   }, [language, code]);
 
   return (
-    <pre>
+    <pre className="rounded-default">
       <code className={`language-${language}`}>{_body}</code>
     </pre>
   );
