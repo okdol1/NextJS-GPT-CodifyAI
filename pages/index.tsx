@@ -1,56 +1,75 @@
 import EditorJsRenderer from "@/components/EditorJsRenderer";
 import Header from "@/components/atom/Header";
-import { OutputBlockData, OutputData } from "@editorjs/editorjs";
+import Select from "@/components/atom/Select";
+import {
+  LANGUAGE_OPTIONS,
+  REQUEST_TYPE_OPTIONS,
+} from "@/constants/selectOptions";
+import { OutputData } from "@editorjs/editorjs";
 import Head from "next/head";
-import React, { FormEvent, useState } from "react";
-
-const initialData: OutputData = {
-  time: 1664631046512,
-  blocks: [
-    {
-      id: "i1HDCAxqng",
-      type: "code",
-      data: {
-        code: "#python\n\n# This program prints Hello, world!\nprint('Hello, world!')\n",
-      },
-    },
-    {
-      id: "S_oEvbfKfl",
-      type: "code",
-      data: {
-        code: "#css\n\nhtml,\nbody {\n  padding: 0;\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,\n    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;\n}\n\n",
-      },
-    },
-  ],
-  version: "2.25.0",
-};
+import Image from "next/image";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import Lottie from "react-lottie";
+import { v4 as uuidv4 } from "uuid";
+import animationData from "../public/images/loading.json";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<OutputData>(initialData);
+  const [data, setData] = useState<OutputData | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [selectLanguage, setSelectLanguage] = useState<string | string[]>();
+  const [selectRequestType, setSelectRequestType] = useState<
+    string | string[]
+  >();
+  const [content, setContent] = useState("");
+  const [isSubmit, setIsSubmit] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setData(null);
     setLoading(true);
 
-    const form = e.currentTarget;
-    const fcn = (form.elements.namedItem("fcn") as HTMLInputElement).value;
-    const language = (form.elements.namedItem("language") as HTMLInputElement)
-      .value;
-
-    console.log({ fcn, language });
-
     const res = await fetch(
-      `/api/get-ai-response?fcn=${fcn}&language=${language}`
+      `/api/get-ai-response?type=${selectRequestType}&language=${selectLanguage}&content=${content}`
     );
-    const data = await res.json();
+    const resData = await res.json();
 
-    console.log(data.choices[0].text);
+    const resCode = `#${selectLanguage}${resData.choices[0].text}`;
+    const newData = {
+      blocks: [
+        {
+          id: uuidv4(),
+          type: "code",
+          data: {
+            code: resCode,
+          },
+        },
+      ],
+    };
 
+    setData(newData);
     setLoading(false);
   };
+
+  const changeSelectLanguage = (option: string | string[]) => {
+    setSelectLanguage(option);
+  };
+
+  const changeSelectRequestType = (option: string | string[]) => {
+    setSelectRequestType(option);
+  };
+
+  const changeContent = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+  };
+
+  useEffect(() => {
+    if (selectLanguage && selectRequestType && content !== "") {
+      return setIsSubmit(true);
+    }
+    return setIsSubmit(false);
+  }, [selectLanguage, selectRequestType, content]);
 
   return (
     <>
@@ -63,23 +82,30 @@ export default function Home() {
       <main className="w-screen h-screen flex flex-col">
         <Header />
         <div className="bg-grey-100 p-10 flex flex-grow space-x-5">
-          <div className="h-full w-1/2 p-7.5 bg-SystemlightBlue rounded-default flex flex-col">
+          <div className="min-w-120 h-full w-1/2 p-7.5 bg-SystemlightBlue rounded-default flex flex-col">
             <h1 className="text-large font-bold mb-7.5">Request</h1>
             <form
               onSubmit={(e) => handleSubmit(e)}
               className="flex-grow flex flex-col"
             >
-              <div className="bg-primary rounded-default py-4 px-5 mb-2.5">
-                <label htmlFor="language">언어 선택</label>
-                <select id="language">
-                  <option value="javascript">JavaScript</option>
-                  <option value="react">React</option>
-                  <option value="vue">Vue</option>
-                  <option value="nextjs">Next.js</option>
-                </select>
+              <div className="flex space-x-2">
+                <Select
+                  width={"w-46"}
+                  value={selectLanguage}
+                  placeholder="Language"
+                  options={LANGUAGE_OPTIONS}
+                  onChange={changeSelectLanguage}
+                />
+                <Select
+                  width="flex-grow"
+                  value={selectRequestType}
+                  placeholder="Type"
+                  options={REQUEST_TYPE_OPTIONS}
+                  onChange={changeSelectRequestType}
+                />
               </div>
               <div
-                className={`bg-grey-100 rounded-default flex-grow flex flex-col border ${
+                className={`mt-2.5 bg-grey-100 rounded-default flex-grow flex flex-col border ${
                   isFocused ? "border-primary" : "border-grey-100"
                 } `}
               >
@@ -89,19 +115,34 @@ export default function Home() {
                     id="txtSource"
                     placeholder="Please enter the content of the code to be generated."
                     className="w-full h-full bg-grey-100 text-large focus:outline-none resize-none"
+                    value={content}
+                    onChange={changeContent}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                   />
                 </div>
-                <div className="py-4 px-5 bg-grey-200 rounded-br-default rounded-bl-default">
-                  <button type="submit">코드 생성</button>
+                <div className="py-3 px-5 bg-grey-200 rounded-br-default rounded-bl-default flex items-center justify-end">
+                  <button type="submit" disabled={!isSubmit}>
+                    <Image
+                      src={`/images/send_${isSubmit ? "primary" : "grey"}.svg`}
+                      alt="send button"
+                      width={24}
+                      height={24}
+                    />
+                  </button>
                 </div>
               </div>
             </form>
           </div>
-          <div className="w-1/2 h-full p-7.5 bg-SystemlightBlue rounded-default">
+          <div className="min-w-120 w-1/2 h-full p-7.5 bg-SystemlightBlue rounded-default">
             <h1 className="text-large font-bold mb-7.5">Response</h1>
-            {loading && <div className="text-white">Please wait...</div>}
+            {loading && (
+              <div className="flex justify-center align-center">
+                <div className="w-30 h-30">
+                  <Lottie options={{ animationData }} />
+                </div>
+              </div>
+            )}
             <EditorJsRenderer data={data} />
           </div>
         </div>

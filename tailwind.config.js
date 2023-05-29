@@ -6,6 +6,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      width: { 30: "120px", 46: "184px" },
+      height: { 30: "120px" },
+      minWidth: { 120: "480px" },
       padding: { 7.5: "30px" },
       margin: { 7.5: "30px" },
       borderRadius: {
@@ -16,6 +19,7 @@ module.exports = {
         SystemlightBlue: "#F9FDFD",
         "grey-100": "#F4F4F4",
         "grey-200": "#E4E4E4",
+        "grey-300": "#a8a8a8",
       },
       fontSize: {
         small: "14px",

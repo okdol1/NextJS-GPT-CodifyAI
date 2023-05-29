@@ -11,7 +11,7 @@ export default async function handler(
 ) {
   const response = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: `${req.query.fcn} ${req.query.language} 언어로 코드 작성해줘`,
+    prompt: `# Write a ${req.query.type} in ${req.query.language} that ${req.query.content}`,
     temperature: 0,
     max_tokens: 100,
   });
